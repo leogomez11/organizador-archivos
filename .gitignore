@@ -1,0 +1,19 @@
+# Entorno virtual
+venv/
+.env/
+
+# Python
+__pycache__/
+*.pyc
+
+# Builds (PyInstaller)
+build/
+dist/
+*.spec
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
