@@ -268,6 +268,9 @@ class App(tk.Tk):
                 lista_archivos = archivos_lista,
                 stop_event = self.cancelar_evento
             )
+            
+            #Definimos intervalo para evitar saturacion
+            intervalo = 50 if total > 1000 else 1
 
             for i, mensaje in enumerate(gen, 1):
                 #Verificacion de cancelacion
@@ -276,7 +279,9 @@ class App(tk.Tk):
                     break
             
                 #Actualizacion segura del UI
-                self.after(0, lambda m=mensaje, v=i: self._actualizar_gui_hija(ventana_hija, ventana_hija.area_log, m, v, total))
+                if i % intervalo == 0 or i == total:
+                    #Usamos valores locales fijos para el lambda (i=i, mensaje=mensaje)
+                    self.after(0, lambda m=mensaje, v=i: self._actualizar_gui_hija(ventana_hija, ventana_hija.area_log, m, v, total))
             
         except Exception as e:
            self.after(0, lambda ex=e: messagebox.showerror("Error Crítico", f"{ex}"))
@@ -300,14 +305,14 @@ class App(tk.Tk):
     
     def _actualizar_gui_hija(self, ventana, log, msj, val, tot):
         """Metodo axuliar para ejecutar el hilo principal"""
+        if not ventana.winfo_exists():
+            return
         try:
             log.insert(tk.END, f"{msj}\n")
             log.see(tk.END)
             if val <= tot:
                 ventana.progreso["value"] = val
                 ventana.label_estado.config(text=f"Procesando: {val}/{tot}")
-                ventana.update_idletasks()
-                ventana.update()
         except tk.TclError:
             pass # La ventana se cerró
     
