@@ -3,6 +3,7 @@
 #--- IMPORTACIONES ---#
 import tkinter as tk
 import threading
+import time
 from pathlib import Path
 from tkinter import messagebox, filedialog, ttk
 from tkinter import scrolledtext as st
@@ -30,7 +31,7 @@ class App(tk.Tk):
         # Fuente Global
         self.style.configure(".", font=("Segoe UI", 10), background=COLOR_BG, foreground=COLOR_TEXT)
         
-        self.title("Organizador de archivos")
+        self.title("File Organizer")
         self.geometry(self.calculo_geometry(550, 280))
         
         self.ruta_icono = Path(__file__).parent / "assets" / "mi_logo.ico"
@@ -38,7 +39,7 @@ class App(tk.Tk):
         try:
             self.iconbitmap(self.ruta_icono)
         except Exception as e:
-            print(f"No se pudo cargar el icono: {e}")
+            print(f"Could not load icon: {e}")
         
         # Configuración de Botones
         self.style.configure("TButton", padding=8, relief="flat", background="#495057", foreground="#FFFFFF", font=("Segoe UI", 10))
@@ -101,18 +102,18 @@ class App(tk.Tk):
         self.IGNORE_HIDDEN = True
         self.RECURSIVE = False
         self.REGLAS = {
-            'Imagenes': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.svg', '.ico'],
+            'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.svg', '.ico'],
             'Videos': ['.mp4', '.mkv', '.avi', '.mov', '.wmv', '.webm'],
-            'Audios': ['.mp3', '.wav', '.aac', '.flac', '.ogg', '.m4a'],
-            'Documentos': ['.txt', '.doc', '.docx', '.odt', '.rtf', '.md'],
-            'Hojas_calculo': ['.xls', '.xlsx', '.ods', '.csv'],
-            'Presentaciones': ['.ppt', '.pptx', '.odp'],
-            'Pdf': ['.pdf'],
-            'Comprimidos': ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'],
-            'Ejecutables': ['.exe', '.msi', '.bat', '.cmd', '.sh'],
-            'Codigo': ['.py', '.js', '.java', '.html', '.css', '.json', '.xml', '.yaml'],
-            'Bases_datos': ['.db', '.sqlite', '.mdb', '.accdb'],
-            'Fuentes': ['.ttf', '.otf', '.woff', '.woff2']
+            'Audio': ['.mp3', '.wav', '.aac', '.flac', '.ogg', '.m4a'],
+            'Documents': ['.txt', '.doc', '.docx', '.odt', '.rtf', '.md'],
+            'Spreadsheets': ['.xls', '.xlsx', '.ods', '.csv'],
+            'Presentations': ['.ppt', '.pptx', '.odp'],
+            'PDF_Files': ['.pdf'],
+            'Archives': ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'],
+            'Executables': ['.exe', '.msi', '.bat', '.cmd', '.sh'],
+            'Source_Code': ['.py', '.js', '.java', '.html', '.css', '.json', '.xml', '.yaml'],
+            'Databases': ['.db', '.sqlite', '.mdb', '.accdb'],
+            'Fonts': ['.ttf', '.otf', '.woff', '.woff2']
         }
         
         
@@ -148,19 +149,19 @@ class App(tk.Tk):
         # Título
         ttk.Label(
             main_frame, 
-            text="Organizador de Archivos", 
+            text="File Organizer", 
             font=("Segoe UI", 14, "bold")
         ).grid(row=0, column=0, columnspan=2, pady=(0, 20), sticky="w")
     
         # Selección de Ruta
-        ttk.Label(main_frame, text="Carpeta a procesar:").grid(row=1, column=0, sticky="w")
+        ttk.Label(main_frame, text="Target Folder:").grid(row=1, column=0, sticky="w")
         
         #Aqui se colocará la ruta a organizar
         self.ruta_var = tk.StringVar(value=str(Path.home() / "Desktop"))
         entry_ruta = ttk.Entry(main_frame, textvariable=self.ruta_var, width=45)
         entry_ruta.grid(row=2, column=0, padx=(0, 10), pady=10, sticky="ew")
     
-        boton_examinar = ttk.Button(main_frame, text="🔍 Cambiar", command=self._seleccion_ruta)
+        boton_examinar = ttk.Button(main_frame, text="🔍 Browse", command=self._seleccion_ruta)
         boton_examinar.grid(row=2, column=1, sticky="e")
         
         #Separador visual
@@ -177,14 +178,14 @@ class App(tk.Tk):
         
         self.boton_simular = ttk.Button(
             botones_frame, 
-            text="Simular Proceso", 
+            text="Simulate Process", 
             command=self.abrir_simulacion
         )
         self.boton_simular.grid(row=0, column=0, padx=5, sticky="ew")
     
         self.boton_mover = ttk.Button(
             botones_frame, 
-            text="🚀 Iniciar Organización", 
+            text="🚀 Start Organizing", 
             command=self.abrir_organizacion, 
             style="Accent.TButton"
         )
@@ -194,7 +195,7 @@ class App(tk.Tk):
         
     #Funcion para boton_examinar
     def _seleccion_ruta(self):
-        seleccion = filedialog.askdirectory(initialdir=str(self.ruta_var.get()), title="Seleccionar Carpeta")
+        seleccion = filedialog.askdirectory(initialdir=str(self.ruta_var.get()), title="Select Folder")
         if seleccion:
             self.ruta_var.set(seleccion)
     
@@ -204,14 +205,14 @@ class App(tk.Tk):
         """
         Funcion: Abrir la ventana de simulacion. Utilizada por 'boton_simular'
         """
-        Ventana_proceso(self, modo="simular")
+        Ventana_proceso(self, modo="simulation")
         
 
     def abrir_organizacion(self):
         """
         Funcion: Abrir la ventana de organizacion. Utilizada por 'boton_mover'
         """
-        Ventana_proceso(self, modo="organizar")
+        Ventana_proceso(self, modo="organization")
         
     
     
@@ -246,7 +247,7 @@ class App(tk.Tk):
             total = len(archivos_lista)
             
             if total == 0:
-                self.after(0, lambda: messagebox.showinfo("Aviso", "No hay archivos para procesar."))
+                self.after(0, lambda: messagebox.showinfo("Notice", "No files found to process."))
                 return 
             
             #Asignamos el numero de progreso
@@ -254,7 +255,7 @@ class App(tk.Tk):
             
     
             # 2. Seleccionar motor (Generador)
-            motor = mover_archivos if modo == "organizar" else simulacion
+            motor = mover_archivos if modo == "organization" else simulacion
     
             # 3. Consumir el generador y actualizar UI
             gen = motor(
@@ -270,52 +271,61 @@ class App(tk.Tk):
             )
             
             #Definimos intervalo para evitar saturacion
-            intervalo = 50 if total > 1000 else 1
-
+            intervalo = 10 if total > 1000 else 1
+            
             for i, mensaje in enumerate(gen, 1):
                 #Verificacion de cancelacion
                 if self.cancelar_evento.is_set():
-                    self.after(0, lambda: ventana_hija.area_log.insert(tk.END, "\n[!] PROCESO CANCELADO POR EL USUARIO.\n"))
+                    self.after(0, lambda: ventana_hija.area_log.insert(tk.END, "[!] PROCESS CANCELLED BY USER.\n"))
                     break
+                
+                if "Total files" in mensaje:
+                    self.after(0, lambda m=mensaje: self._actualizar_solo_log(ventana_hija.area_log, f"\n{m}"))
+                    #No actualizamos la barra aquí para que no cuente como proceso el mensaje "[SIMULATION] Total files moved: {total}"
+                    continue
+                
+                #Actualizacion de la barra
+                self.after(0, lambda v=i, t=total: self._actualizar_solo_barra(ventana_hija, v, t))
             
-                #Actualizacion segura del UI
+                #Actualizacion log
                 if i % intervalo == 0 or i == total:
                     #Usamos valores locales fijos para el lambda (i=i, mensaje=mensaje)
-                    self.after(0, lambda m=mensaje, v=i: self._actualizar_gui_hija(ventana_hija, ventana_hija.area_log, m, v, total))
+                    self.after(0, lambda m=mensaje: self._actualizar_solo_log(ventana_hija.area_log, m))
+              
             
         except Exception as e:
-           self.after(0, lambda ex=e: messagebox.showerror("Error Crítico", f"{ex}"))
+           self.after(0, lambda ex=e: messagebox.showerror("Critical Error", f"{ex}"))
         finally:
             self.after(0, lambda: self._alternar_botones("normal"))
             
             if not self.cancelar_evento.is_set():
-                self.after(0, lambda: messagebox.showinfo(
-                    "Proceso", f"{modo.capitalize()} finalizada."
+                self.after(500, lambda: messagebox.showinfo(
+                    "Success", f"{modo.capitalize()} completed."
                     ))
 
-    def _init_progreso(self, ventana, total):
-        """
-        Asignamos el numero total de archivos a procesar y procesados.
-        definimos la funcion para evitar interferir entre el hilo principal y secundario
-        """
-        ventana.progreso["value"] = 0
-        ventana.progreso["maximum"] = total
-        ventana.label_estado.config(text=f"Procesando: 0/{total}")
+
+    def _actualizar_solo_barra(self, ventana, val, tot):
+        """Actualiza la barra y contador"""
+        if not ventana.winfo_exists(): return
+        try:
+            ventana.progreso["maximum"] = tot
+            ventana.progreso["value"] = val
+            
+            ventana.label_estado.config(text=f"Procesing: {val}/{tot}")
+            
+            #Forzamos a la interfaz a dibujar antes de seguir
+            ventana.update_idletasks()
+        except tk.TclError:
+            pass
+        
     
-    
-    def _actualizar_gui_hija(self, ventana, log, msj, val, tot):
-        """Metodo axuliar para ejecutar el hilo principal"""
-        if not ventana.winfo_exists():
-            return
+    def _actualizar_solo_log(self, log, msj):
+        """Inserta texto en el log (frecuencia controlada)"""
         try:
             log.insert(tk.END, f"{msj}\n")
             log.see(tk.END)
-            if val <= tot:
-                ventana.progreso["value"] = val
-                ventana.label_estado.config(text=f"Procesando: {val}/{tot}")
-        except tk.TclError:
-            pass # La ventana se cerró
-    
+        except (tk.TclError, AttributeError):
+            pass
     
     def _cancelar_proceso(self):
         """Activa la señal de parada"""
@@ -346,14 +356,14 @@ class Ventana_proceso(tk.Toplevel):
         self.padre = padre
         self.configure(bg="#FFFFFF")
         
-        self.title("Simulación" if modo == "simular" else "Organización")
+        self.title("Simulation" if modo == "simulation" else "Organization")
         self.geometry(padre.calculo_geometry(650, 520))
         self.transient(padre) #Ventana asociada a la principal
         self.iconbitmap(padre.ruta_icono) #Seleccion del icono
         self.focus_force() # Forzar el foco inicial
         
         
-        self.label_estado = ttk.Label(self, text="Preparando proceso...", font=("Segoe UI", 10))
+        self.label_estado = ttk.Label(self, text="Preparing process...", font=("Segoe UI", 10))
         self.label_estado.pack(side="top", pady=(15, 5))
         
         self.progreso = ttk.Progressbar(
@@ -365,7 +375,7 @@ class Ventana_proceso(tk.Toplevel):
         self.progreso.pack(side="top", fill="x", padx=40, pady=5)
         
         # Botón Cancelar
-        self.btn_cancelar = ttk.Button(self, text="Cancelar proceso", command=padre._cancelar_proceso)
+        self.btn_cancelar = ttk.Button(self, text="Cancel Process", command=padre._cancelar_proceso)
         self.btn_cancelar.pack(side="bottom", pady=20)
         
         self.area_log = st.ScrolledText(
@@ -387,20 +397,20 @@ class Ventana_proceso(tk.Toplevel):
         self.after(
             0,
             lambda: self.area_log.insert(
-                tk.END, f"--- Iniciando {modo} ---\n"
+                tk.END, f"--- Starting {modo} ---\n"
             )
         )
         
         self.protocol("WM_DELETE_WINDOW", self._al_cerrar)
         
         try:
-            if modo == "simular":
-                padre._iniciar_hilo(modo="simular", ventana_hija=self)
+            if modo == "simulation":
+                padre._iniciar_hilo(modo="simulation", ventana_hija=self)
             else:
-                padre._iniciar_hilo(modo="organizar", ventana_hija=self)
+                padre._iniciar_hilo(modo="organization", ventana_hija=self)
                 
         except Exception as e:
-            print("ERROR EN HILO GUI:", e)
+            print("GUI THREAD ERROR:", e)
             import traceback
             traceback.print_exc()
         

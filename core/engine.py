@@ -16,7 +16,7 @@ def resolver_destino(archivo: Path, reglas: dict, destinos: dict) -> tuple[str, 
     extension = archivo.suffix.lower()
     categoria = detectar_categoria(extension, reglas)
 
-    carpeta_destino = destinos.get(categoria, destinos["otros"])
+    carpeta_destino = destinos.get(categoria, destinos["Others"])
 
     destino_final = carpeta_destino / archivo.name
     fue_renombrado = False
@@ -25,7 +25,7 @@ def resolver_destino(archivo: Path, reglas: dict, destinos: dict) -> tuple[str, 
         fue_renombrado = True
         contador = 1
         while True:
-            nuevo_nombre = f"{archivo.stem}_copia{contador}{extension}"
+            nuevo_nombre = f"{archivo.stem}_copy{contador}{extension}"
             destino_final = carpeta_destino / nuevo_nombre
             if not destino_final.exists():
                 break
@@ -96,12 +96,11 @@ def mover_archivos(
 ):
     destinos = crear_destinos(base, reglas)
     
-    #Fuente: Para evitar errores en los scripts GUI y CLI
     fuente = lista_archivos if lista_archivos is not None else iterar_archivos(base, recursive, exclude, only, ignore_hidden, stats)
     
     for archivo in fuente:
         if stop_event and stop_event.is_set():
-            yield "[!] Abortando operación interna..."
+            yield "[!] Aborting internal operation..."
             return 
         categoria, destino_final, fue_renombrado = resolver_destino(
             archivo, reglas, destinos
@@ -117,62 +116,59 @@ def mover_archivos(
             stats.registrar_procesados()
             if fue_renombrado:
                 logging.warning(
-                    f"Archivo renombrado por colisión: {archivo.name} → {destino_final.name}"
+                    f"File renamed due to collision: {archivo.name} → {destino_final.name}"
                 )
                 click.echo(
                     click.style(
-                        f"Archivo renombrado por colisión: {archivo.name} → {destino_final.name}",
+                        f"File renamed due to collision: {archivo.name} → {destino_final.name}",
                         fg="yellow",
                     )
                 )
-                yield f"Archivo renombrado por colisión: {archivo.name} → {destino_final.name}"
+                yield f"File renamed due to collision: {archivo.name} → {destino_final.name}"
             else:
-                click.echo(f"Movido: {archivo.name} → {destino_final}")
-                yield f"Movido: {archivo.name} → {destino_final}"
+                click.echo(f"Moved: {archivo.name} → {destino_final}")
+                yield f"Moved: {archivo.name} → {destino_final}"
 
         except PermissionError as e:
             if e.errno == errno.EACCES:
-                # En el caso de que el usuario no tenga permisos en el sistema de archivos
-                logging.error(f"ERROR {archivo.name} no tiene permiso de acceso")
-                click.echo(f"Error {archivo.name} no tiene permiso de acceso")
+                logging.error(f"ERROR {archivo.name} access denied")
+                click.echo(f"Error {archivo.name} access denied")
                 stats.registrar_error()
-                yield f"ERROR {archivo.name} no tiene permiso de acceso"
+                yield f"ERROR {archivo.name} access denied"
 
 
             elif e.errno == errno.EAGAIN:
-                # En el caso de que el archivo esté bloqueado por otro programa (en uso)
                 logging.error(
-                    f"ERROR El archivo {archivo.name} está siendo usado por otro programa"
+                    f"ERROR File {archivo.name} is being used by another program"
                 )
                 click.echo(
-                    f"ERROR El archivo {archivo.name} está siendo usado por otro programa"
+                    f"ERROR File {archivo.name} is being used by another program"
                 )
                 stats.registrar_error()
-                yield f"ERROR El archivo {archivo.name} está siendo usado por otro programa"
+                yield f"ERROR File {archivo.name} is being used by another program"
 
 
             else:
-                # Otros errores de permiso generales
-                logging.error(f"ERROR de seguridad: {e}")
-                click.echo(f"Error de seguridad: {e}")
+                logging.error(f"Security ERROR: {e}")
+                click.echo(f"Security Error: {e}")
                 stats.registrar_error()
-                yield f"Error de seguridad: {e}"
+                yield f"Security Error: {e}"
 
 
         except OSError as e:
-            logging.error(f"ERROR Al mover {archivo.name}: {e}")
-            click.echo(f"Error moviendo {archivo.name}: {e}")
+            logging.error(f"ERROR Moving {archivo.name}: {e}")
+            click.echo(f"Error moving {archivo.name}: {e}")
             stats.registrar_error()
-            yield f"ERROR Al mover {archivo.name}: {e}"
+            yield f"ERROR Moving {archivo.name}: {e}"
 
     click.echo(
         click.style(
-            f"\nTotal de archivos movidos: {stats.procesados}",
+            f"\nTotal files moved: {stats.procesados}",
             bold=True,
             fg="green",
         )
     )
-    yield f"\nTotal de archivos movidos: {stats.procesados}"
+    yield f"\nTotal files moved: {stats.procesados}"
 
 
 def simulacion(
@@ -193,7 +189,7 @@ def simulacion(
     
     for archivo in fuente:
         if stop_event and stop_event.is_set():
-            yield "[!] Abortando operación interna..."
+            yield "[!] Aborting internal operation..."
             return
         categoria, destino_final, fue_renombrado = resolver_destino(
             archivo, reglas, destinos
@@ -208,21 +204,20 @@ def simulacion(
         if fue_renombrado:
             click.echo(
                 click.style(
-                    f"[SIMULACIÓN] Archivo renombrado por colisión: {archivo.name} → {destino_final.name}",
+                    f"[SIMULATION] File renamed due to collision: {archivo.name} → {destino_final.name}",
                     fg="yellow",
                 )
             )
-            yield f"[SIMULACIÓN] Archivo renombrado por colisión: {archivo.name} → {destino_final.name}"
+            yield f"[SIMULATION] File renamed due to collision: {archivo.name} → {destino_final.name}"
         else:
-            click.echo(f"[SIMULACIÓN] {archivo.name} → {destino_final}")
-            yield f"[SIMULACIÓN] {archivo.name} → {destino_final}"
+            click.echo(f"[SIMULATION] {archivo.name} → {destino_final}")
+            yield f"[SIMULATION] {archivo.name} → {destino_final}"
 
     click.echo(
         click.style(
-            f"\n[SIMULACIÓN] Total de archivos movidos: {total_archivos_simulados}",
+            f"\n[SIMULATION] Total files moved: {total_archivos_simulados}",
             bold=True,
             fg="blue",
         )
     )
-    yield f"[SIMULACIÓN] Total de archivos movidos: {total_archivos_simulados}"
-
+    yield f"[SIMULATION] Total files moved: {total_archivos_simulados}"

@@ -39,3 +39,4 @@ def leer_json(ruta_config: Path, stats: Stats):
         logging.error(f"JSON inválido: {e}")
         stats.registrar_error()
         return None  # Devolver None para indicar fallo de lectura/formato
+

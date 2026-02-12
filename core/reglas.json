@@ -1,1 +1,14 @@
-{"imagenes": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".svg", ".ico"], "videos": [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".webm"], "audios": [".mp3", ".wav", ".aac", ".flac", ".ogg", ".m4a"], "documentos": [".txt", ".doc", ".docx", ".odt", ".rtf", ".md"], "hojas_calculo": [".xls", ".xlsx", ".ods", ".csv"], "presentaciones": [".ppt", ".pptx", ".odp"], "pdf": [".pdf"], "comprimidos": [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"], "ejecutables": [".exe", ".msi", ".bat", ".cmd", ".sh"], "codigo": [".py", ".js", ".java", ".html", ".css", ".json", ".xml", ".yaml"], "bases_datos": [".db", ".sqlite", ".mdb", ".accdb"], "fuentes": [".ttf", ".otf", ".woff", ".woff2"]}
+{
+  "images": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".svg", ".ico"],
+  "videos": [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".webm"],
+  "audio": [".mp3", ".wav", ".aac", ".flac", ".ogg", ".m4a"],
+  "documents": [".txt", ".doc", ".docx", ".odt", ".rtf", ".md"],
+  "spreadsheets": [".xls", ".xlsx", ".ods", ".csv"],
+  "presentations": [".ppt", ".pptx", ".odp"],
+  "pdf": [".pdf"],
+  "compressed": [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"],
+  "executables": [".exe", ".msi", ".bat", ".cmd", ".sh"],
+  "code": [".py", ".js", ".java", ".html", ".css", ".json", ".xml", ".yaml"],
+  "databases": [".db", ".sqlite", ".mdb", ".accdb"],
+  "fonts": [".ttf", ".otf", ".woff", ".woff2"]
+}

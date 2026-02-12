@@ -12,7 +12,7 @@ if __name__ == "__main__":
     app_id = "leonel_gomez.organizador_archivos.1.0.0"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
     #Iniciamos el logging
-    ruta_exe = obtener_ruta_base()
+    ruta_exe = obtener_ruta_base() / "logs"
     log_config(ruta_exe, "INFO")
     
     #Iniciar la aplicación
